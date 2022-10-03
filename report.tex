@@ -1,0 +1,74 @@
+\documentclass[italian,12pt,a4paper,oneside,final]{report}
+%\documentclass[italian,a4paper,titlepage]{article}
+%\usepackage{amsmath}
+%\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{biblatex} %Imports biblatex package
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{csquotes}
+%\usepackage[T1]{fontenc}
+%\usepackage{longtable}
+%\usepackage{booktabs}
+%\usepackage{textcomp}
+%\usepackage[draft=false]{hyperref}
+%\usepackage{hyperref}
+%\usepackage[table]{xcolor}
+\addbibresource{iot.bib} %Import the bibliography file
+\graphicspath{ {images/} }
+\renewcommand{\thesection}{\arabic{section}} % remove the \chapter counter from being printed with every \section
+%\hypersetup{
+%	colorlinks=true,
+%	linkcolor=,
+%	pdftitle={Marco Giunta - Progetto IoT},
+%	pdfauthor={Marco Giunta},
+%}
+
+\title{\huge Power Meter Wi-Fi con Arduino\\[0.5em]
+\large Relazione Progetto IoT}
+\date{Ottobre 2022}
+\author{
+Marco Giunta\thanks{Marco Giunta 147852 giunta.marco@spes.uniud.it}}
+
+\begin{document}
+% Generate title page
+\maketitle
+
+% Generate TOCs
+\pagenumbering{arabic}
+\tableofcontents
+
+\newpage
+
+\section{Introduzione}
+In questo periodo storico, dove i problemi causati dal riscaldamento globale sono sotto gli occhi di tutti, si rende necessario ridurre il consumo energetico all'interno delle nostre case o negli edifici pubblici.
+Per poter decidere quali azioni intraprendere, bisogna prima conoscere il reale consumo delle nostre apparecchiature.
+Con questo progetto si vuole realizzare un prototipo a basso costo di un misuratore di consumo elettrico collegato ad una rete locale tramite Wi-Fi.
+Il progetto ha come obiettivo l’acquisizione e il monitoraggio dei valori di tensione, corrente e potenza presenti ai capi di un qualunque apparecchio alimentato a 220V.
+Il codice presente all'interno del dispositivo è stato progettato per permettere il collegamento contemporaneo di circa 65000 unità, in modo da poter monitorare, ad esempio, tutte le apparecchiature presenti all'interno di un istituto di ricerca.
+Per garantire il monitoraggio di un numero così elevato di dispositivi, è stato necessario ricorrere all'utilizzo del protocollo MQTT\footfullcite{mqtt}, per ottimizzare la gestione della banda di rete e autenticare i singoli dispositi.
+
+
+
+La parte del monitoraggio si appoggia a due servizi cloud gratuiti, InfluxDB per
+la creazione ed il mantenimento del database e Grafana per la parte di visualiz-
+zazione tramite dashboard.
+Nonostante InfluxDB proponga un servizio di visualizzazione con dashboard,
+viene scelto Grafana per una migliore estetica.
+In caso serva un database completo, i dati rilevati dall’Arduino Uno vengo sal-
+vati su una scheda SD in modo da prevenire disconnessioni e garantire una facile
+futura elaborazione dei dati senza l’utilizzo dei servizi cloud.
+
+\section{Sensori}
+
+
+
+Lo scopo di questa settima esperienza di laboratorio è determinare i valori delle costanti di taratura della funzione di trasferimento di un sensore di temperatura, usato come trasduttore tra le grandezze temperatura e resistenza.
+Misureremo la temperatura di un bagno termico attraverso un termometro ad alcool e una serie di termistori NTC.
+Inoltre determineremo il tempo di risposta di uno dei termistori NTC utilizzati durante l'esperimento.
+
+\subsection{Trasduzione di grandezze fisiche}
+In tutti i casi in cui si vuole misurare una grandezza fisica, ma non è possibile confrontarla con uno o più campioni o definirla mediante una misura indiretta, si ricorre alla \emph{correlazione} della grandezza fisica con un’altra, più semplice da misurare.
+I dispositivi che permettono questo tipo di correlazione (\emph{trasduzione}) vengono chiamati \textbf{trasduttori}.
+\end{document}

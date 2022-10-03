@@ -42,24 +42,18 @@ Marco Giunta\thanks{Marco Giunta 147852 giunta.marco@spes.uniud.it}}
 \newpage
 
 \section{Introduzione}
-In questo periodo storico, dove i problemi causati dal riscaldamento globale sono sotto gli occhi di tutti, si rende necessario ridurre il consumo energetico all'interno delle nostre case o negli edifici pubblici.
-Per poter decidere quali azioni intraprendere, bisogna prima conoscere il reale consumo delle nostre apparecchiature.
+Una delle sfide chiave del XXI secolo è l’adattamento ai cambiamenti climatici.
+Per riuscire a limitare il riscaldamento globale, è necessario impiegare l’energia in modo efficiente, riducendo il consumo all'interno delle proprie abitazioni o negli edifici pubblici.
+Per poter decidere quali misure adottare, è indispensabile conoscere il consumo reale delle apparecchiature che usiamo ogni giorno.
+
 Con questo progetto si vuole realizzare un prototipo a basso costo di un misuratore di consumo elettrico collegato ad una rete locale tramite Wi-Fi.
-Il progetto ha come obiettivo l’acquisizione e il monitoraggio dei valori di tensione, corrente e potenza presenti ai capi di un qualunque apparecchio alimentato a 220V.
-Il codice presente all'interno del dispositivo è stato progettato per permettere il collegamento contemporaneo di circa 65000 unità, in modo da poter monitorare, ad esempio, tutte le apparecchiature presenti all'interno di un istituto di ricerca.
-Per garantire il monitoraggio di un numero così elevato di dispositivi, è stato necessario ricorrere all'utilizzo del protocollo MQTT\footfullcite{mqtt}, per ottimizzare la gestione della banda di rete e autenticare i singoli dispositi.
+Il progetto ha come obiettivo l’acquisizione e il monitoraggio dei valori di tensione, corrente e potenza presenti ai capi di un qualunque apparecchio collegato alla rete elettrica domestica (220V).
+Il codice presente all'interno del dispositivo è stato progettato per permettere il collegamento contemporaneo di circa 65.000 unità, per essere in grado di monitorare, ad esempio, tutte le apparecchiature presenti all'interno di un istituto di ricerca.
 
+Per garantire il monitoraggio di un numero così elevato di dispositivi, è stato necessario ricorrere all'utilizzo del protocollo MQTT\footfullcite{mqtt}, per ottimizzare la gestione della banda di rete e garantire l'autenticazione dei singoli dispositivi.
+Per raccogliere i dati è stato utilizzato il sistema di gestione di database InfluxDB\footfullcite{influxdb} mentre, per la parte di visualizzazione tramite dashboard, è stato utilizzato il software Grafana\footfullcite{grafana}.
 
-
-La parte del monitoraggio si appoggia a due servizi cloud gratuiti, InfluxDB per
-la creazione ed il mantenimento del database e Grafana per la parte di visualiz-
-zazione tramite dashboard.
-Nonostante InfluxDB proponga un servizio di visualizzazione con dashboard,
-viene scelto Grafana per una migliore estetica.
-In caso serva un database completo, i dati rilevati dall’Arduino Uno vengo sal-
-vati su una scheda SD in modo da prevenire disconnessioni e garantire una facile
-futura elaborazione dei dati senza l’utilizzo dei servizi cloud.
-
+A solo scopo dimostrativo, il broker Mosquitto\footfullcite{mosquitto}, il collettore Telegraf\footfullcite{telegraf}, InfluxDB e Grafana sono stati configurati, utilizzando la tecnologia dei container, in una scheda single-board ARM Orange Pi PC 2 con sistema operativo Fedora IoT.
 \section{Sensori}
 
 

@@ -54,9 +54,27 @@ Per garantire il monitoraggio di un numero così elevato di dispositivi, è stat
 Per raccogliere i dati è stato utilizzato il sistema di gestione di database InfluxDB\footfullcite{influxdb} mentre, per la parte di visualizzazione tramite dashboard, è stato utilizzato il software Grafana\footfullcite{grafana}.
 
 A solo scopo dimostrativo, il broker Mosquitto\footfullcite{mosquitto}, il collettore Telegraf\footfullcite{telegraf}, InfluxDB e Grafana sono stati configurati, utilizzando la tecnologia dei container, in una scheda single-board ARM Orange Pi PC 2 con sistema operativo Fedora IoT.
-\section{Sensori}
+
+\newpage
+
+\section{Componenti}
+Per la realizzazione del prototipo sono stati utilizzati questi componenti:
+
+\begin{itemize}
+\item Arduino MKR1000
+\item Display LCD 16×2
+\item Modulo LCM1602 IIC per display LCD
+\item Sensore di Corrente AC-CC da 5A con ACS712
+\item Sensore di tensione con ZMPT101B
+\item Divisori di tensione (da 5V a 3.3V)
+\end{itemize}
 
 
+\subsection{Schema elettrico}
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{power_meter_bb.pdf}
+\centering
+\end{figure}
 
 Lo scopo di questa settima esperienza di laboratorio è determinare i valori delle costanti di taratura della funzione di trasferimento di un sensore di temperatura, usato come trasduttore tra le grandezze temperatura e resistenza.
 Misureremo la temperatura di un bagno termico attraverso un termometro ad alcool e una serie di termistori NTC.

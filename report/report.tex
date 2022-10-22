@@ -12,18 +12,18 @@
 %\usepackage{longtable}
 %\usepackage{booktabs}
 %\usepackage{textcomp}
-%\usepackage[draft=false]{hyperref}
+\usepackage[draft=false]{hyperref}
 %\usepackage{hyperref}
 %\usepackage[table]{xcolor}
 \addbibresource{iot.bib} %Import the bibliography file
 \graphicspath{ {images/} }
 \renewcommand{\thesection}{\arabic{section}} % remove the \chapter counter from being printed with every \section
-%\hypersetup{
-%	colorlinks=true,
-%	linkcolor=,
-%	pdftitle={Marco Giunta - Progetto IoT},
-%	pdfauthor={Marco Giunta},
-%}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=,
+	pdftitle={Marco Giunta - Progetto IoT},
+	pdfauthor={Marco Giunta},
+}
 
 \title{\huge Power Meter Wi-Fi con Arduino\\[0.5em]
 \large Relazione Progetto IoT}
@@ -44,16 +44,16 @@ Marco Giunta\thanks{Marco Giunta 147852 giunta.marco@spes.uniud.it}}
 \section{Introduzione}
 Una delle sfide chiave del XXI secolo è l’adattamento ai cambiamenti climatici.
 Per riuscire a limitare il riscaldamento globale, è necessario impiegare l’energia in modo efficiente, riducendo il consumo all'interno delle proprie abitazioni o negli edifici pubblici.
-Per poter decidere quali misure adottare, è indispensabile conoscere il consumo reale delle apparecchiature che usiamo ogni giorno.
+Per decidere quali misure adottare, è indispensabile conoscere il consumo reale delle apparecchiature che usiamo ogni giorno.
 
 Con questo progetto si vuole realizzare un prototipo a basso costo di un misuratore di consumo elettrico collegato ad una rete locale tramite Wi-Fi.
 Il progetto ha come obiettivo l’acquisizione e il monitoraggio dei valori di tensione, corrente e potenza presenti ai capi di un qualunque apparecchio collegato alla rete elettrica domestica (220V).
-Il codice presente all'interno del dispositivo è stato progettato per permettere il collegamento contemporaneo di circa 65.000 unità, per essere in grado di monitorare, ad esempio, tutte le apparecchiature presenti all'interno di un istituto di ricerca.
+Il codice presente all'interno del dispositivo è stato progettato per permettere il collegamento contemporaneo di circa 65.000 unità, in modo da poter monitorare, ad esempio, tutte le apparecchiature presenti all'interno di un istituto di ricerca.
 
 Per garantire il monitoraggio di un numero così elevato di dispositivi, è stato necessario ricorrere all'utilizzo del protocollo MQTT\footfullcite{mqtt}, per ottimizzare la gestione della banda di rete e garantire l'autenticazione dei singoli dispositivi.
 Per raccogliere i dati è stato utilizzato il sistema di gestione di database InfluxDB\footfullcite{influxdb} mentre, per la parte di visualizzazione tramite dashboard, è stato utilizzato il software Grafana\footfullcite{grafana}.
 
-A solo scopo dimostrativo, il broker Mosquitto\footfullcite{mosquitto}, il collettore Telegraf\footfullcite{telegraf}, InfluxDB e Grafana sono stati configurati, utilizzando la tecnologia dei container, in una scheda single-board ARM Orange Pi PC 2 con sistema operativo Fedora IoT.
+A solo scopo dimostrativo, il broker Mosquitto\footfullcite{mosquitto}, il collettore Telegraf\footfullcite{telegraf}, il database InfluxDB e il software Grafana sono stati installati e configurati utilizzando la tecnologia dei container.
 
 \newpage
 
@@ -64,7 +64,7 @@ Per la realizzazione del prototipo sono stati utilizzati questi componenti:
 \item Arduino MKR 1000 WiFi
 \item Display LCD 16×2
 \item Modulo LCM1602 IIC per display LCD
-\item Sensore di Corrente AC-CC da 5A con ACS712
+\item Sensore di corrente AC-CC da 5A con ACS712
 \item Sensore di tensione con ZMPT101B
 \item Divisori di tensione (da 5V a 3.3V)
 \end{itemize}
@@ -76,60 +76,83 @@ Per la realizzazione del prototipo sono stati utilizzati questi componenti:
 \centering
 \end{figure}
 
-\subsection{Arduino MKR1000}
-The Arduino microprocessor board is a single
-board microprocessor used in intelligent projects and
+\subsection{Arduino MKR 1000 WiFi}
+La scheda Arduino MKR 1000 WiFi è un prodotto specifico per IoT.
+Integra al suo interno un processore Arm Cortex-M0 32-bit SAMD21, un chip di sicurezza ATECC508A e un controller Wi-Fi ATWINC1500.
+Ci sono 7 pin d'ingresso analogico (A0-A6) in grado di rilevare una tensione d'ingresso compresa da 0 e 3.3V .
 
-prototyping. The functions performed by the
-microprocessor include; sensing, controlling, logical and
-computing applications. The software used in the arduino
-programming is a simplified version of C/C++ language
-which makes it easy to use in designing and prototyping.
-The board comes in many forms such as Arduino UNO,
-Arduino MEGA 2560, Arduiono Leonardo etc. It has
-extensible hardware and software; it is also inexpensive
-and can work across so many platforms.
+\subsection{Sensore di corrente}
+Il sensore di corrente è un modulo che utilizza il sensore ACS712 in grado di misurare correnti fino a 5A.
+Quando nessuna corrente attraversa il sensore ACS712, il modulo ha una tensione d'uscita pari a metà della tensione di alimentazione, che deve essere 5V.
 
+Nel modello usato in questo progetto, la tensione di uscita varia di 185 mV per ogni A di corrente rilevata dal sensore.
 
-Arduino has the ability to measure voltage using analog input pin. For Arduino UNO, there are 6 analog input pins (A0-A5) where you can use one of the pins to measure AC voltage. Arduino NANO has 8 pins while Arduino MEGA has 16 input pins. The analog input pins will map input voltages between 0 and 5V into integer values between 0 and 1023 with resolution of 4.9mV per unit (5.00V / 1023 units). Do not reverse the voltage polarity which may damage the pins.
+\subsection{Sensore di tensione}
+Il sensore di tensione è un modulo che utilizza il trasformatore ZMPT101B ed è in grado di misurare tensioni fino a 250V AC.
+Sulla scheda è presente un potenziometro multigiro per regolare il guadagno dell'uscita ADC.
 
+Quando non è presente nessuna tensione all'ingresso del trasformatore, il modulo ha una tensione d'uscita pari a metà della tensione di alimentazione che, anche in questo caso, deve essere 5V.
 
-\subsection{Sensore di tensione con ZMPT101B}
-ZMPT101B voltage sensor module is a voltage
-sensor made from the ZMPT101B voltage transformer. It
-has high accuracy, good consistency for voltage and power
-measurement and it can measure up to 250V AC. It is
-simple to use and comes with a multi turn trim
-potentiometer for adjusting the ADC output. The analysis
-in this paper tends to find more accurate relationship
-between the input voltage and the ADC output by
-regression analysis. The ADC output is adjusted using the
-trimpot to an appropriate value against a reference input.
-Figure-1 is the ZMPT101B voltage sensor module.
+\subsection{Display LCD}
+Per visualizzare i valori di tensione e corrente misurati dai sensori e quelli di potenza (reale ed apparente) calcolati, è stato utilizzato un display LCD da 16 caratteri e 2 righe.
+Il display è pilotato da un modulo LM1602, basato sul chip PCF8574, che permette la connessione di qualunque scheda Arduino attraverso il bus $I^2C$.
+Anche questo modulo deve essere alimentato a 5V.
 
+\newpage
 
-When there is no load on output (nothing is connected to infput), the sensor has an initial voltage (Offset) of VCC/2. That is, if nothing is connected to the input and the supply voltage of the module is 5 volts, the output of the module will be 2.5 volts. 
+\subsection{Divisori di tensione}
+I pin d'ingresso analogico della scheda Arduino MKR 1000 WiFi sono in grado di rilevare tensioni fino a 3.3V, mentre i sensori di corrente e tensione funzionano con una tensione di alimentazione di 5V.
+Entrambi i sensori hanno una tensione di uscita che varia da 0 a 5V, incompatile con i pin della scheda Arduino.
+Per ovviare al problema sono stati realizzati dei divisori di tensione (figura~\ref{fig:voltage_divider}) in modo da \textit{convertire} il range della tensione di uscita dei sensori da 0-5V a 0-3.3V.
 
-The ZMPT101B voltage sensor module is a
-voltage sensor board made from ZMPT101B potential
-transformer which is capable of measuring up to 250V
-AC. The sensor comes with a multi turn trim
-potentiometer for adjusting the ADC output. Unlike the
-current sensor where the scaling is provided by factory
-trimming, the ZMPT101B sensor has to be trimmed and
-calibrated by the user.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.25\textwidth]{voltage_divider.pdf}
+	\caption{Divisore di tensione}
+	\label{fig:voltage_divider}
+\end{figure}
 
+\newpage
 
-The output signal of the Single Phase AC Voltage Module is a waveform of analog values from 0 to 1023. The frequency of the wave is following the Voltage measured. Since the amplitude is adjustable, the voltage analog signal need to be calibrated. In order to calibrate, you need another voltmeter for reference. It can be either multimeter or regular voltmeter that can measure AC Voltage (RMS). The maximum voltage that the module can measured (250Vac) is referring to the Root Mean Square (RMS) value. Technically it can measure the waveform up to the peak at 353.55 Vac peak. 
+\section{Codice Arduino}
+Nella fase di \textit{setup}, vengono letti i valori di calibrazione dei sensori (argomento trattato in questa sezione), connessa la scheda alla rete Wi-Fi e attivato il display LCD.
 
-The AC Voltage Module analog measurement is similar to Current Module. The voltage value will fluctuate up and down within 0 to 5V (0 to 1023 value). When no voltage detected, it will send analog signal at half the supply voltage (example 2.5V) which is about value 512. Different module will have different deviation error. Some might be reading exactly 512 when no measurement voltage detected but some may be slightly more or slightly less than value 512. You will have to manually key in the offset value during the first start or during no voltage detected. The AC Voltage Module requires at least 5V power supply and the signal output voltage is within 5V thus if you have a Arduino Nano or NodeMCU that have 3.3V analog pins, you need to add a voltage divider resistors in between to reduce or step down the output analog values.
+Prima di attivare la connessione con il broker MQTT, viene generato il \textit{clientID} a partire da un prefisso (\emph{pwrmtr}) e dal valore del terzo e quarto ottetto dell'indirizzo IP.
+Se necessario, vengono aggiunti degli zeri ai valori degli ottetti, in modo da ottenere un \textit{clientID} di lunghezza fissa 
+In questo modo è possibile collegare circa 65.000 unità senza modificare il codice sorgente.
+Per evitare connessioni al broker da parte di client non autorizzati, la connessione è autenticata tramite \textit{username} e \textit{password}.
 
+Nella fase di \textit{loop}, sul display viene visualizzato il valore di corrente e tensione calcolato su una media di 1000 campioni.
+Dato che le grandezze misurate dai sensori sono corrente e tensione alternata, per ottenere una misura accurata è stato necessario calcolarne il \emph{valore efficace} (semplificando, il valore equivalente in corrente continua).
+Ogni milli secondo viene registrato un campione e ogni mille campioni (ogni secondo) viene calcolato il valore RMS dei campioni in questo modo:
+\begin{itemize}
+  \item si eleva al quadrato ogni campione, in modo da perdere il segno dei valori negativi
+  \item si calcola la media dei quadrati dei campioni
+  \item si estrae la radice quadrata della media
+\end{itemize}
 
-\section{Codice}
+\noindent Per effettuare queste operazioni è stata usata la libreria Statistical\footfullcite{statistical}.
 
+Sul display sono visualizzati anche i valori di potenza, calcolati su una media di 1000 campioni.
+Per ottenere il valore di potenza reale viene fatta la media dei prodotti del valore istantaneo di corrente e tensione dei campioni.
+L'unità di misura di questo valore è il Watt.
+Mentre per ottenere il valore di potenza apparente viene fatta la media dei prodotti del valore efficace (RMS) di corrente e tensione calcolati in precedenza.
+In questo caso l'unità di misura è il Volt Ampere(VA).
 
-The sensor module is a sensitive sensor. The output reading of the sensor might produce electrical noises or fake values even when there is no voltage detected. In order to greatly reduce this phenomenon, multiple samples must be taken for averaging and initial offset must be done. Our code is designed to display a value which is derived from averaging 1000 samples in a second. Each sample is recorded every 1 milli seconds (0.001 second). Each single sample value is being squared initially and once the 1000 sample values are accumulated, the average value from the 1000 samples is then being square-rooted in order to come out the Root Mean Square (RMS) voltage value which is to be displayed at Serial Monitor and LCD Display. With this averaging, the fluctuation of value is way lesser.
+\newpage
 
+Una volta ottenuti tutti i valori, questi vengono inviati al broker MQTT usando un \emph{topic} diverso per ogni valore:
+
+\begin{enumerate}
+  \item[]sensors/\textit{clientId}/voltage
+  \item[] sensors/\textit{clientId}/current
+  \item[] power/\textit{clientId}/real
+  \item[] power/\textit{clientId}/apparent
+\end{enumerate}
+
+\subsection{Calibrazione}
+
+The sensor module is a sensitive sensor. The output reading of the sensor might produce electrical noises or fake values even when there is no voltage detected. In order to greatly reduce this phenomenon, multiple samples must be taken for averaging and initial offset must be done.  
 The second problem could be the false signal and accuracy problem. Each sensor has its own deviation error. When there is no voltage sensed, the sensor might not be 100% at middle point of voltage value. Some might be remaining at few milli voltages above / below the middle point even though after averaging. This might be due to voltage supplied not in exact 5V or due to the sensor itself. Thus 12V power adapter to power the Arduino UNO is highly recommended.
 
 Besides, the sensor requires initial offset setting. You may need to manually offset the value by checking the false value when no voltage measurement during Arduino startup and then key in offset value in the code file. Secondly, make sure the sensor cables are tight because minor movement of wires might affects on the wire terminal connections thus affecting the accuracy reading.
@@ -137,12 +160,12 @@ Besides, the sensor requires initial offset setting. You may need to manually of
 Once the wave swing is calibrated to oscillate at exact middle point, after the calculation of squared, averaging and square root, there is still some minor false value existed even no voltage measurement. So our code included the second offset setting to eliminate this noise value. 
 
 
-
 If you really read through the codes, we actually has reduced the potential wave amplitude by a factor of 0.66. 
 
 RMSVoltageMean = (sqrt(voltageMean))*1.5;
 
 What I realized is that by default, the waveform will start to distort before reaching 250Vac. It will affect the accuracy of other values if we calibrate based on distorted wave. So to solve this issue, I have reduced the amplitude by a factor of 0.66 in the coding, so that the waveform will not stretched till the maximum extend. You will realize when monitoring voltage is switched on, the voltage value is high and you need to reduce it. 
+
 
 
 
@@ -163,16 +186,12 @@ I would use a union because then the data exists in two different formats at the
 slot 8 Typical Use Data Bytes 416
 
 
-\subsection{Potenza reale e apparente}
-Apparent power is the product of the root mean square(rms) values of the current and voltage
-
-Real power is the product of the instantaneous values of the current and voltage in the circuit
-
-The unit of Apparent power is Volt Ampere(VA)
 
 
-The unit of Real Power is Watt
 
+The output signal of the Single Phase AC Voltage Module is a waveform of analog values from 0 to 1023. The frequency of the wave is following the Voltage measured. Since the amplitude is adjustable, the voltage analog signal need to be calibrated. In order to calibrate, you need another voltmeter for reference. It can be either multimeter or regular voltmeter that can measure AC Voltage (RMS). The maximum voltage that the module can measured (250Vac) is referring to the Root Mean Square (RMS) value. Technically it can measure the waveform up to the peak at 353.55 Vac peak. 
+
+The AC Voltage Module analog measurement is similar to Current Module. The voltage value will fluctuate up and down within 0 to 5V (0 to 1023 value). When no voltage detected, it will send analog signal at half the supply voltage (example 2.5V) which is about value 512. Different module will have different deviation error. Some might be reading exactly 512 when no measurement voltage detected but some may be slightly more or slightly less than value 512. You will have to manually key in the offset value during the first start or during no voltage detected. The AC Voltage Module requires at least 5V power supply and the signal output voltage is within 5V thus if you have a Arduino Nano or NodeMCU that have 3.3V analog pins, you need to add a voltage divider resistors in between to reduce or step down the output analog values.
 
 
 \end{document}

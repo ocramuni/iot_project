@@ -274,7 +274,7 @@ void loop() {
   if(currentSampleCount == 1000) {                                                            // after 1000 samples (~ 1 second), do the calculation and display value
       offsetCurrentMean = currentSampleSumOffset / currentSampleCount;                        // average the offset reading
       RMSCurrentMean = currentDataArray.Average(currentDataArray.RMS_Avg) + currentOffset2;   // get RMS of current samples
-      //((RMSCurrentMean / 1024) * 5000)) is converting the read voltage in 0-5000 milli volts
+      //((RMSCurrentMean / 1024) * 5000)) is converting the read voltage in 0-5000 milli Volts
       FinalRMSCurrent = (((RMSCurrentMean / 1024) * 5000) / mVperAmpValue);                   // calculate the final RMS current
       if (Serial) {
         Serial.print(FinalRMSCurrent, decimalPrecision*2);                                      // display RMS Voltage on serial terminal
@@ -322,7 +322,7 @@ void loop() {
 
  /*
   * AC Power Measurement
-  * Read current ans voltage values to calculate real power.
+  * Read current and voltage values to calculate real power.
   * Use RMS current and RMS voltage to calculate apparent power.
   */
   if(millis() >= powerLastSample + 1) {                                                             // take 1 reading every 1 milli second

@@ -46,7 +46,7 @@ const char ssid[] = SECRET_SSID;        ///< network SSID
 const char pass[] = SECRET_PASS;        ///< Wi-Fi network password
 
 // MQTT
-const char brokerAddress[] = "fedtop.home.arpa";        ///< MQTT Broker Hostname
+const char brokerAddress[] = "mosquitto";        ///< MQTT Broker Hostname
 const int brokerPort = 1883;                            ///< MQTT Broker Port
 const char brokerUsername[] = SECRET_MQTT_SERVER_USERNAME;
 const char brokerPassword[] = SECRET_MQTT_SERVER_PASSWORD;
@@ -235,7 +235,7 @@ void loop() {
   // Calculate offset from voltage samples mean
   if(makeVoltageCalibration == 1) {                                                   // Run this code when calibration is required
       voltageOffset1 = 0; 
-      if(millis() >= voltageOffsetLastSample + 1) {                                   // keep countng time for offset1
+      if(millis() >= voltageOffsetLastSample + 1) {                                   // keep counting time for offset1
         voltageOffsetSampleCount = voltageOffsetSampleCount + 1;                      // every 1 milli second add 1 count
         voltageOffsetLastSample = millis();
       }                                             
@@ -248,7 +248,7 @@ void loop() {
   // Calculate offset value from RMS of voltageData
   if(makeVoltageCalibration == 2) {                                                   // Run this code after first offset done
       voltageOffset2 = 0;                                                             
-      if(millis() >= voltageOffsetLastSample + 1) {                                   // keep countng time for offset2                                                                       
+      if(millis() >= voltageOffsetLastSample + 1) {                                   // keep counting time for offset2
         voltageOffsetSampleCount = voltageOffsetSampleCount + 1;                                                                          
         voltageOffsetLastSample = millis();                                                                          
       }                                                                                

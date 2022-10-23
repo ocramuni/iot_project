@@ -1,23 +1,18 @@
 \documentclass[italian,12pt,a4paper,oneside,final]{report}
-%\documentclass[italian,a4paper,titlepage]{article}
-%\usepackage{amsmath}
-%\usepackage{caption}
-%\usepackage{subcaption}
+\usepackage[toc]{appendix}
+\usepackage{listings}
 \usepackage{graphicx}
 \usepackage{biblatex} %Imports biblatex package
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \usepackage{csquotes}
-%\usepackage[T1]{fontenc}
-%\usepackage{longtable}
-%\usepackage{booktabs}
-%\usepackage{textcomp}
-\usepackage[draft=false]{hyperref}
-%\usepackage{hyperref}
-%\usepackage[table]{xcolor}
+\usepackage{hyperref}
 \addbibresource{iot.bib} %Import the bibliography file
 \graphicspath{ {images/} }
+\lstset{captionpos=b,showspaces=false,basicstyle=\ttfamily,showstringspaces=false,breaklines=true}
 \renewcommand{\thesection}{\arabic{section}} % remove the \chapter counter from being printed with every \section
+\renewcommand{\appendixtocname}{Appendice}
+\renewcommand{\appendixpagename}{Appendice}
 \hypersetup{
 	colorlinks=true,
 	linkcolor=,
@@ -46,14 +41,14 @@ Una delle sfide chiave del XXI secolo è l’adattamento ai cambiamenti climatic
 Per riuscire a limitare il riscaldamento globale, è necessario impiegare l’energia in modo efficiente, riducendo il consumo all'interno delle proprie abitazioni o negli edifici pubblici.
 Per decidere quali misure adottare, è indispensabile conoscere il consumo reale delle apparecchiature che usiamo ogni giorno.
 
-Con questo progetto si vuole realizzare un prototipo a basso costo di un misuratore di consumo elettrico collegato ad una rete locale tramite Wi-Fi.
+Con questo progetto si vuole realizzare un prototipo a basso costo di un misuratore di consumo elettrico collegato ad una rete locale tramite \mbox{Wi-Fi}.
 Il progetto ha come obiettivo l’acquisizione e il monitoraggio dei valori di tensione, corrente e potenza presenti ai capi di un qualunque apparecchio collegato alla rete elettrica domestica (220V).
 Il codice presente all'interno del dispositivo è stato progettato per permettere il collegamento contemporaneo di circa 65.000 unità, in modo da poter monitorare, ad esempio, tutte le apparecchiature presenti all'interno di un istituto di ricerca.
 
 Per garantire il monitoraggio di un numero così elevato di dispositivi, è stato necessario ricorrere all'utilizzo del protocollo MQTT\footfullcite{mqtt}, per ottimizzare la gestione della banda di rete e garantire l'autenticazione dei singoli dispositivi.
 Per raccogliere i dati è stato utilizzato il sistema di gestione di database InfluxDB\footfullcite{influxdb} mentre, per la parte di visualizzazione tramite dashboard, è stato utilizzato il software Grafana\footfullcite{grafana}.
 
-A solo scopo dimostrativo, il broker Mosquitto\footfullcite{mosquitto}, il collettore Telegraf\footfullcite{telegraf}, il database InfluxDB e il software Grafana sono stati installati e configurati utilizzando la tecnologia dei container.
+Per l'installazione e configurazione del broker Mosquitto\footfullcite{mosquitto}, il collettore Telegraf\footfullcite{telegraf}, il database InfluxDB e il software Grafana è stata utilizzata la tecnologia dei container.
 
 \newpage
 
@@ -94,7 +89,7 @@ Sulla scheda è presente un potenziometro multigiro per regolare il guadagno del
 Quando non è presente nessuna tensione all'ingresso del trasformatore, il modulo ha una tensione d'uscita pari a metà della tensione di alimentazione che, anche in questo caso, deve essere 5V.
 
 \subsection{Display LCD}
-Per visualizzare i valori di tensione e corrente misurati dai sensori e quelli di potenza (reale ed apparente) calcolati, è stato utilizzato un display LCD da 16 caratteri e 2 righe.
+Per visualizzare i valori di tensione e corrente misurati dai sensori e quelli di potenza (reale ed apparente) calcolati, è stato utilizzato un display LCD da 16 caratteri a 2 righe.
 Il display è pilotato da un modulo LM1602, basato sul chip PCF8574, che permette la connessione di qualunque scheda Arduino attraverso il bus $I^2C$.
 Anche questo modulo deve essere alimentato a 5V.
 
@@ -102,7 +97,7 @@ Anche questo modulo deve essere alimentato a 5V.
 
 \subsection{Divisori di tensione}
 I pin d'ingresso analogico della scheda Arduino MKR 1000 WiFi sono in grado di rilevare tensioni fino a 3.3V, mentre i sensori di corrente e tensione funzionano con una tensione di alimentazione di 5V.
-Entrambi i sensori hanno una tensione di uscita che varia da 0 a 5V, incompatile con i pin della scheda Arduino.
+Entrambi i sensori hanno una tensione di uscita che varia da 0 a 5V, incompatibile con i pin della scheda Arduino.
 Per ovviare al problema sono stati realizzati dei divisori di tensione (figura~\ref{fig:voltage_divider}) in modo da \textit{convertire} il range della tensione di uscita dei sensori da 0-5V a 0-3.3V.
 
 \begin{figure}[h]
@@ -112,13 +107,11 @@ Per ovviare al problema sono stati realizzati dei divisori di tensione (figura~\
 	\label{fig:voltage_divider}
 \end{figure}
 
-\newpage
-
 \section{Codice Arduino}
-Nella fase di \textit{setup}, vengono letti i valori di calibrazione dei sensori (argomento trattato in questa sezione), connessa la scheda alla rete Wi-Fi e attivato il display LCD.
+Nella fase di \textit{setup}, vengono letti i valori di calibrazione dei sensori (maggiori dettagli nella sezione \ref{section:calibrazione}), connessa la scheda alla rete Wi-Fi e attivato il display LCD.
 
 Prima di attivare la connessione con il broker MQTT, viene generato il \textit{clientID} a partire da un prefisso (\emph{pwrmtr}) e dal valore del terzo e quarto ottetto dell'indirizzo IP.
-Se necessario, vengono aggiunti degli zeri ai valori degli ottetti, in modo da ottenere un \textit{clientID} di lunghezza fissa 
+Se necessario, vengono aggiunti degli zeri ai valori degli ottetti, in modo da ottenere un \textit{clientID} di lunghezza fissa.
 In questo modo è possibile collegare circa 65.000 unità senza modificare il codice sorgente.
 Per evitare connessioni al broker da parte di client non autorizzati, la connessione è autenticata tramite \textit{username} e \textit{password}.
 
@@ -139,8 +132,6 @@ L'unità di misura di questo valore è il Watt.
 Mentre per ottenere il valore di potenza apparente viene fatta la media dei prodotti del valore efficace (RMS) di corrente e tensione calcolati in precedenza.
 In questo caso l'unità di misura è il Volt Ampere(VA).
 
-\newpage
-
 Una volta ottenuti tutti i valori, questi vengono inviati al broker MQTT usando un \emph{topic} diverso per ogni valore:
 
 \begin{enumerate}
@@ -150,48 +141,188 @@ Una volta ottenuti tutti i valori, questi vengono inviati al broker MQTT usando 
   \item[] power/\textit{clientId}/apparent
 \end{enumerate}
 
-\subsection{Calibrazione}
+\newpage
 
-The sensor module is a sensitive sensor. The output reading of the sensor might produce electrical noises or fake values even when there is no voltage detected. In order to greatly reduce this phenomenon, multiple samples must be taken for averaging and initial offset must be done.  
-The second problem could be the false signal and accuracy problem. Each sensor has its own deviation error. When there is no voltage sensed, the sensor might not be 100% at middle point of voltage value. Some might be remaining at few milli voltages above / below the middle point even though after averaging. This might be due to voltage supplied not in exact 5V or due to the sensor itself. Thus 12V power adapter to power the Arduino UNO is highly recommended.
+\subsection{Calibrazione}\label{section:calibrazione}
+La tensione di uscita dei moduli varia tra 0 to 5V in base alla tensione o alla corrente presente all'ingresso: questo valore viene convertito dalla scheda Arduino in un numero compreso tra 0 e 1023.
+Come detto in precedenza, quando non è presente nessuna tensione o non c'è assorbimento di corrente, la tensione presente all'uscita dei moduli è pari a metà della tensione di alimentazione degli stessi: visto che i moduli sono alimentati a 5V, la tensione di uscita è circa 2.5V.
 
-Besides, the sensor requires initial offset setting. You may need to manually offset the value by checking the false value when no voltage measurement during Arduino startup and then key in offset value in the code file. Secondly, make sure the sensor cables are tight because minor movement of wires might affects on the wire terminal connections thus affecting the accuracy reading.
+A causa delle tolleranze dei componenti presenti all'interno moduli è possibile che ci siano delle fluttuazioni della tensione di uscita.
+Per limitare questo problema viene effettuata, in modo automatico, una calibrazione dei sensori al primo avvio dopo la scrittura del codice.
+Vediamo più in dettaglio questa procedura.
 
-Once the wave swing is calibrated to oscillate at exact middle point, after the calculation of squared, averaging and square root, there is still some minor false value existed even no voltage measurement. So our code included the second offset setting to eliminate this noise value. 
+La prima volta che si accende la scheda dopo aver caricato il codice, non bisogna collegare nulla né all'ingresso né all'uscita del Power Meter: tensione e corrente misurate devono essere pari a zero.
+
+Vengono letti 2000 campioni, calcolata la media dei valori assoluti e definito un valore di \textit{offset} da aggiungere a tutte le successive letture.
+Con lo stesso metodo viene calcolata la media dei valori RMS e definito un secondo valore di \textit{offset} da aggiungere a tutti i valori RMS calcolati.
+Usando 5000 campioni, viene definito con la stesso tipo di procedura l'ultimo valore di \textit{offset} da aggiungere al calcolo della potenza reale.
+
+Visto che la calibrazione può esser fatta solo quando tensione e corrente misurate sono pari a zero, non è possibile eseguire la procedura ad ogni avvio.
+Bisogna salvare i valori degli \textit{offset} all'interno della memoria della scheda Arduino e leggerli ad ogni avvio: purtroppo questo modello non ha una \mbox{EEPROM on-board}.
+Fortunatamente nel chip di sicurezza Microchip ATECC508A è presente una EEPROM da 10Kb, spazio più che sufficiente per salvare questi dati.
+La EEPROM è in divisa in 16 slot di diversa capacità: secondo quanto indicato sul datasheet, lo slot 8 è il candidato ideale per salvare questo tipo di informazioni visto che la capacità dello slot è di 416 Bytes e i dati da salvare sono in formato \textit{float} (su Arduino occupano 4 Byte\footfullcite{float}).
+Anche se per salvare gli \textit{offset} sarebbe sufficiente un blocco da 20 Byte \mbox{(5 offset * 4Byte)}, per eseguire un unica operazioni di lettura/scrittura, si utilizza un blocco di 32 Bytes, dove i restanti sono 12 Byte non sono utilizzati.
+
+\noindent Per effettuare queste operazioni è stata usata la libreria ArduinoECCX08\footfullcite{eccx08}.
+
+La calibrazione viene eseguita solo al primo avvio, per forzare una ricalibrazione basta collegare per un instante il pin 6 al pin GND.
+Durante la calibrazione non vengono inviati dati al broker MQTT e sul display appare la scritta in figura~\ref{fig:calibration_in_progress}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{calibration_in_progress.jpg}
+	\caption{Calibrazione in corso}
+	\label{fig:calibration_in_progress}
+\end{figure}
+
+Dopo avere effettuato la calibrazione automatica, bisogna calibrare il guadagno dell'uscita del sensore di tensione.
+Per farlo, bisogna collegare l'ingresso del Power Meter alla rete elettrica, un multimetro in grado di effettuare una misurazione valore RMS di tensione all'uscita e ruotare in senso orario o antiorario il potenziometro multigiro presente sul sensore fino a quando i valori misurati non coincidono (figura~\ref{fig:voltage_calibration}).
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.75\textwidth]{voltage_calibration.jpg}
+	\caption{Calibrazione sensore di tensione}
+	\label{fig:voltage_calibration}
+\end{figure}
+
+Per evitare problemi nella lettura dei valori quando la tensione misurata è vicina al limite dei 250V AC, il guadagno dell'uscita del sensore è stato ridotto di circa 1/3 all'interno del codice Arduino (\textit{outputGain}).
+
+\section{Presentazione dei dati}
+Per visualizzare i dati misurati dal Power Meter è stata realizzata una dashboard Grafana.
+Il Power Meter invia i valori rilevati dai sensori ad un broker Mosquitto, i quali vengono presi da un collettore Telegraf e salvati all'interno di un database InfluxDB.
+Tutti questi componenti software sono stati installati e configurati usando Docker.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\textwidth]{grafana_lavatrice.png}
+	\caption{Valori rilevati durante un ciclo di lavaggio a $30^\circ C$}
+	\label{fig:grafana_lavatrice}
+\end{figure}
+
+Nella figura~\ref{fig:grafana_lavatrice} si possono vedere i dati rilevati ai capi di una lavatrice durante un ciclo di lavaggio a $30^\circ C$.
+Nella sezione \textit{Power} vengono visualizzati i dati della potenza reale e di quella apparente.
 
 
-If you really read through the codes, we actually has reduced the potential wave amplitude by a factor of 0.66. 
+\section{Conclusioni}
+Il prototipo realizzato ha raggiunto gli obiettivi previsti: è un misuratore di consumo elettrico, realizzabile a basso costo ed è in grado di inviare i dati tramite la rete Wi-Fi.
+Anche se i sensori utilizzati nel progetto non sono di tipo professionale, i valori rilevati sono abbastanza precisi e permettono una valutazione dei consumi reali di un qualunque apparecchio collegato alla rete elettrica.
 
-RMSVoltageMean = (sqrt(voltageMean))*1.5;
+Data la semplicità e il basso costo di realizzazione, il progetto può essere utilizzato per monitorare i consumi degli apparecchi presenti all'interno di un intero edificio.
+Inoltre, la possibilità di visualizzare i consumi in tempo reale, tramite una dash board Grafana, è un aiuto importante nella valutazione di azioni da intraprendere per ridurre i consumi energetici, identificando le apparecchiature più \textit{energivore} o le ore della giornata dove si registrano i consumi più elevati.
 
-What I realized is that by default, the waveform will start to distort before reaching 250Vac. It will affect the accuracy of other values if we calibrate based on distorted wave. So to solve this issue, I have reduced the amplitude by a factor of 0.66 in the coding, so that the waveform will not stretched till the maximum extend. You will realize when monitoring voltage is switched on, the voltage value is high and you need to reduce it. 
+\appendices
+\noindent{\huge\bfseries APPENDICE\par}
 
+\section{Prototipo}
 
+\begin{figure}[ht]
+	\makebox[\textwidth][c]
+	{\includegraphics[width=1.3\textwidth]{power_meter_picture.jpg}}
+	\caption{Foto del prototipo}
+	\label{fig:prototipo}
+\end{figure}
 
+\newpage
 
-you can use the flash of the SAMD with the EEPROM emulation library
+\section{Docker Compose}
+\begin{lstlisting}[caption=docker-compose.yaml]
+version: "3.8"
+  services:
+    influxdb:
+      image: influxdb
+      environment:
+        - TZ=Europe/Rome
+        - DOCKER_INFLUXDB_INIT_MODE=setup
+        - DOCKER_INFLUXDB_INIT_USERNAME=user
+        - DOCKER_INFLUXDB_INIT_PASSWORD=password
+        - DOCKER_INFLUXDB_INIT_ORG=org
+        - DOCKER_INFLUXDB_INIT_BUCKET=telegraf
+        - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN='jcTCQ5PRSjOtj5ur0TkGc9y93aRYb...AdSzVdZu2qCUsV5iaIwQg=='
+      ports:
+        - "8086:8086"
+      networks:
+        - iot
+      volumes:
+        - influxdb/data:/var/lib/influxdb2
+        - influxdb/config:/etc/influxdb2
+      restart: always
 
-Microchip ATECC508A
+    telegraf:
+      image: telegraf
+      user: "telegraf"
+      environment:
+        - TZ=Europe/Rome
+      ports:
+        - "8125:8125/udp"
+      networks:
+        - iot
+      volumes:
+        - telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      depends_on:
+        - influxdb
+        - mosquitto
+      restart: always
 
-10 Kb EEPROM Memory for Keys, Certificates, and Data
+    grafana:
+      image: grafana/grafana-oss
+      ports:
+        - "3000:3000"
+      networks:
+        - iot
+      volumes:
+        - grafana/data:/var/lib/grafana
+      depends_on:
+        - influxdb
+      restart: always
 
+    mosquitto:
+      image: eclipse-mosquitto
+      ports:
+        - "1883:1883"
+      networks:
+        - iot
+      volumes:
+        - mosquitto/:/mosquitto/
+      restart: always
 
-blocco di 32 bytes perchè The Read/Write command reads words (one four byte word or an 8-word block of 32 bytes)
+  networks:
+    iot:
+\end{lstlisting}
+	
+\section{Configurazione Mosquitto}
+\begin{lstlisting}[caption=mosquitto.conf]
+allow_anonymous false
+password_file /mosquitto/config/password_file
+listener 1883
+persistence true
+persistence_location /mosquitto/data/
+\end{lstlisting}
 
-The Write command writes either one four byte word or an 8-word block of 32 bytes to one of the
-EEPROM zones on the device.
+\begin{lstlisting}[caption=password\_file]
+telegraf:$7$101$lJSpen5vJKMmX3vj$j5f...dSc9Fs6X1nUeJqjc47AA==
+\end{lstlisting}
 
-I would use a union because then the data exists in two different formats at the same time without any need for conversion.
+\section{Configurazione Telegraf}
+\begin{lstlisting}[caption=telegraf.conf]
+[[inputs.mqtt_consumer]]
+servers = ["tcp://mosquitto:1883"]
 
-slot 8 Typical Use Data Bytes 416
+topics = [
+"sensors/#",
+"power/#",
+]
 
+username = "telegraf"
+password = "metricsmetricsmetricsmetrics"
 
+data_format = "value"
+data_type = "float"
 
-
-
-The output signal of the Single Phase AC Voltage Module is a waveform of analog values from 0 to 1023. The frequency of the wave is following the Voltage measured. Since the amplitude is adjustable, the voltage analog signal need to be calibrated. In order to calibrate, you need another voltmeter for reference. It can be either multimeter or regular voltmeter that can measure AC Voltage (RMS). The maximum voltage that the module can measured (250Vac) is referring to the Root Mean Square (RMS) value. Technically it can measure the waveform up to the peak at 353.55 Vac peak. 
-
-The AC Voltage Module analog measurement is similar to Current Module. The voltage value will fluctuate up and down within 0 to 5V (0 to 1023 value). When no voltage detected, it will send analog signal at half the supply voltage (example 2.5V) which is about value 512. Different module will have different deviation error. Some might be reading exactly 512 when no measurement voltage detected but some may be slightly more or slightly less than value 512. You will have to manually key in the offset value during the first start or during no voltage detected. The AC Voltage Module requires at least 5V power supply and the signal output voltage is within 5V thus if you have a Arduino Nano or NodeMCU that have 3.3V analog pins, you need to add a voltage divider resistors in between to reduce or step down the output analog values.
-
+[[outputs.influxdb_v2]]
+urls = ["http://influxdb:8086"]
+token = "jcTCQ5PRSjOtj5ur0TkGc9y93aRYb...AdSzVdZu2qCUsV5iaIwQg=="
+organization = "org"  
+bucket = "telegraf"
+\end{lstlisting}
 
 \end{document}

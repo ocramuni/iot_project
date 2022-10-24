@@ -43,3 +43,6 @@
 ## Build tool directories for auxiliary files
 # latexrun
 latex.out/
+
+# Mac cache file
+.DS_Store

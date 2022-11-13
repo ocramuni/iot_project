@@ -161,8 +161,7 @@ Visto che la calibrazione può esser fatta solo quando tensione e corrente misur
 Bisogna salvare i valori degli \textit{offset} all'interno della memoria della scheda Arduino e leggerli ad ogni avvio: purtroppo questo modello non ha una \mbox{EEPROM on-board}.
 Fortunatamente nel chip di sicurezza Microchip ATECC508A è presente una EEPROM da 10Kb, spazio più che sufficiente per salvare questi dati.
 La EEPROM è in divisa in 16 slot di diversa capacità: secondo quanto indicato sul datasheet, lo slot 8 è il candidato ideale per salvare questo tipo di informazioni visto che la capacità dello slot è di 416 Bytes e i dati da salvare sono in formato \textit{float} (su Arduino occupano 4 Byte\footfullcite{float}).
-Anche se per salvare gli \textit{offset} sarebbe sufficiente un blocco da 20 Byte \mbox{(5 offset * 4Byte)}, per eseguire un unica operazioni di lettura/scrittura, si utilizza un blocco di 32 Bytes, dove i restanti sono 12 Byte non sono utilizzati.
-
+Anche se per salvare gli \textit{offset} sarebbe sufficiente un blocco da 20 Byte \mbox{(5 offset * 4Byte)}, per eseguire un unica operazione di lettura/scrittura, si utilizza un blocco di 32 Bytes, dove i restanti 12 Byte non sono utilizzati.
 \noindent Per effettuare queste operazioni è stata usata la libreria ArduinoECCX08\footfullcite{eccx08}.
 
 La calibrazione viene eseguita solo al primo avvio, per forzare una ricalibrazione basta collegare per un instante il pin 6 al pin GND.
@@ -187,6 +186,7 @@ Per farlo, bisogna collegare l'ingresso del Power Meter alla rete elettrica, un 
 
 Per evitare problemi nella lettura dei valori quando la tensione misurata è vicina al limite dei 250V AC, il guadagno dell'uscita del sensore è stato ridotto di circa 1/3 all'interno del codice Arduino (\textit{outputGain}).
 
+\newpage
 \section{Presentazione dei dati}
 Per visualizzare i dati misurati dal Power Meter è stata realizzata una dashboard Grafana.
 Il Power Meter invia i valori rilevati dai sensori ad un broker Mosquitto, i quali vengono presi da un collettore Telegraf e salvati all'interno di un database InfluxDB.
